@@ -86,6 +86,23 @@ class BoxedPath:
   def __rtruediv__(self, key):
     return NotImplemented
   
+  def __len__(self):
+    return len(self._unrestrained.resolve().parts) - len(pathlib.Path(self._sandbox_real_path).parts)
+
+  @property
+  def parts(self):
+      sandbox_parts = pathlib.Path(self._sandbox_real_path).parts
+      path_parts = self._unrestrained.resolve().parts
+      return path_parts[len(sandbox_parts):]
+
+  def __getitem__(self, key):
+    if isinstance(key, slice):
+      return self.parts[key]
+    elif isinstance(key, int):
+      return self._unrestrained[key]
+    else:
+      raise TypeError("Invalid argument type.")
+
   #def __fspath__(self):
   #  return self._unrestrained
   
@@ -97,11 +114,20 @@ class BoxedPath:
 
   def exists(self):
     return self._unrestrained.exists()
+
+  @property
+  def base(self):
+    return PathSandbox(self._sandbox_real_path)
+  
+  @property
+  def suffix(self):
+    return self._unrestrained.suffix  
   
   @property
   def parent(self):
     parent = self._unrestrained.parent
-    BoxedPath._validateConstraint(parent, self._sandbox_real_path)
+    # no need to validate - __init__ does that. 
+    # BoxedPath._validateConstraint(parent, self._sandbox_real_path)
     return BoxedPath(parent, _PreprocessedRealpath(self._sandbox_real_path))
 
   @property
@@ -112,6 +138,10 @@ class BoxedPath:
     except:
       return BoxedPath(self._sandbox_real_path, _PreprocessedRealpath(self._sandbox_real_path))
     return BoxedPath(parent, _PreprocessedRealpath(self._sandbox_real_path))
+
+  @property
+  def relative_to_base(self):
+    return pathlib.Path(os.path.realpath(self._unrestrained)).relative_to(self._sandbox_real_path).__str__()
 
   """ Returns the real path, with no constraints """  
   def insecure_unrestrained_realpath(self):
