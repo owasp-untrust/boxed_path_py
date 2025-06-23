@@ -1,4 +1,4 @@
-## BoxedPath and SandboxPath: Secure File Path Handling
+## BoxedPath and PathSandbox: Secure File Path Handling
 
 #### **The Need**
 In modern applications, especially those handling untrusted code or user-uploaded files, secure access to the file system is critical. Unrestricted access can lead to vulnerabilities such as:
@@ -10,13 +10,13 @@ To mitigate these risks, applications need a mechanism to enforce strict constra
 ---
 
 #### **The Solution**
-The `BoxedPath` and `Sandbox` classes provide a robust solution for secure file path management:
+The `BoxedPath` and `PathSandbox` classes provide a robust solution for secure file path management:
 - **BoxedPath**:
   - Ensures any file path manipulation stays within a predefined sandbox directory.
   - Validates paths during initialization and every operation to prevent unauthorized access.
   - Supports common file operations like opening files, checking existence, and retrieving metadata.
 
-- **Sandbox**:
+- **PathSandbox**:
   - A specialized form of `BoxedPath` that represents the root of a sandbox.
   - Simplifies creating a constrained environment by setting the sandbox and path to the same directory.
 
@@ -31,13 +31,13 @@ The `BoxedPath` and `Sandbox` classes provide a robust solution for secure file 
 ---
 
 #### **Sample Code**
-Here’s an example demonstrating the use of `BoxedPath` and `Sandbox`:
+Here’s an example demonstrating the use of `BoxedPath` and `PathSandbox`:
 
 ```python
-from boxedpath import BoxedPath, Sandbox
+from boxedpath import BoxedPath, PathSandbox
 
 # Define a secure sandbox directory
-sandbox = Sandbox('/secure/sandbox')
+sandbox = PathSandbox('/secure/sandbox')
 
 # Create a path within the sandbox
 file_path = sandbox / 'example.txt'
@@ -105,7 +105,7 @@ Migrating from Python's built-in `pathlib.Path` to `BoxedPath` involves understa
 
    **After**:
    ```python
-   sandbox = Sandbox('/secure/sandbox')  # shorthand for BoxedPath('/secure/sandbox', '/secure/sandbox')
+   sandbox = PathSandbox('/secure/sandbox')  # shorthand for BoxedPath('/secure/sandbox', '/secure/sandbox')
    path = sandbox / 'example.txt'
    ```
 
@@ -193,7 +193,8 @@ if file_path.exists():
 ```python
 from boxedpath import BoxedPath
 
-sandbox = BoxedPath('/secure/sandbox', '/secure/sandbox')
+sandbox = PathSandbox('/secure/sandbox')  # shorthand for BoxedPath('/secure/sandbox', '/secure/sandbox')
+
 file_path = sandbox / 'example.txt'
 
 if file_path.exists():
